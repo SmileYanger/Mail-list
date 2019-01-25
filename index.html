@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工作汇报</title>
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <link href="css/bootstrap-treeview.css" rel="stylesheet">
+    <!--<link rel="stylesheet" type="text/css" href="css/font-awesome.css"/>-->
+    <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <style type="text/css">
+        .gray-bg {
+            background-color: #ebeff8;
+        }
+
+        /*表单弹框*/
+        .assignor {
+            width: 764px;
+        }
+
+        .assignor .row {
+            background-color: #f8f8f8;
+            padding: 24px 30px 30px;
+        }
+
+        .header2 {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .header2 div {
+            margin-left: 50%;
+        }
+
+        .assignor .col-sm-6 input {
+            position: relative;
+            width: 100%;
+            height: 36px;
+            margin-bottom: 10px;
+            background-color: #fff;
+            border: none;
+            text-indent: 10px;
+        }
+
+        #treeview-checkable {
+            background-color: #fff;
+        }
+
+        .assignor .col-sm-6 .sel {
+            position: absolute;
+            right: 30px;
+            top: 10px;
+        }
+
+        .assignor .right {
+            padding-left: 32px;
+            margin-top: 60px;
+        }
+
+        .assignor .right .done {
+            color: #333;
+        }
+
+        .operate {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .assignor .bottom {
+            display: flex;
+            justify-content: center;
+        }
+
+        .assignor .bottom div {
+            width: 110px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+        }
+
+        .assignor .bottom div:first-child {
+            background-color: #fff;
+        }
+
+        .assignor .bottom div:last-child {
+            background-color: #37adff;
+            color: #fff;
+            margin-left: 16px;
+        }
+
+        .bianji {
+            line-height: 30px;
+            color: #333;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .bianji i {
+            font-size: 20px;
+        }
+
+        .bianji i:hover {
+            font-size: 24px;
+            color: #37adff;
+        }
+    </style>
+</head>
+
+<body class="gray-bg">
+<div class="modal inmodal" id="myModal2" tabindex="-1" role="dialog" aria-hidden="false" style="display: block;">
+    <div class="modal-dialog assignor">
+        <div class="modal-content animated bounceInRight">
+            <div class="row">
+                <div class="header2">
+                    <div>选择指派人123</div>
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">x</span>
+                    </button>
+                </div>
+                <div class="col-sm-6">
+                    <input type="input" class="" id="input-check-node" placeholder="请输入姓名搜索" value="">
+                    <i class="iconfont sel">X</i>
+                    <div id="treeview-checkable"></div>
+                </div>
+                <div class="col-sm-6 right">
+                    <div class="operate">
+                        <div class="done">已选</div>
+                        <div class="empty">清空</div>
+                    </div>
+                    <div id="checkable-output"></div>
+                </div>
+                <div class="bottom col-sm-12">
+                    <div class="col-sm-6" data-dismiss="modal">取消</div>
+                    <div class="col-sm-6 sureBtn" data-dismiss="modal">确定</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 全局js -->
+<script src="js/jquery.min.js"></script>
+
+<script src="js/bootstrap-treeview.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script type="text/javascript">
+
+       var defaultData = [{
+        text: '办公室',
+	        nodes: [{
+	        	id:25,
+	            text: '文员：王丽'
+	        },
+            {
+            		id:26,
+	                text: '行政：张丽'
+	            }
+	        ],
+
+    	},
+        {
+            text: '办公室',
+            nodes: [{
+            	id:27,
+                text: '文员：001'
+            },
+                {
+                	id:28,
+                    text: '行政：002'
+                },
+                 {
+                	id:88,
+                    text: '人事：小锦锦'
+                },
+                 {
+                	id:68,
+                    text: '助理：小王'
+                }
+            ],
+        },
+        {
+            text: '办公室',
+            nodes: [{
+            	id:29,
+                text: '文员：003'
+            },
+                {
+                	id:12,
+                    text: '行政：004'
+                },
+                 {
+                	id:23,
+                    text: '运营：小马'
+                }
+            ],
+        }
+    ];
+    // console.log(defaultData)
+    var textList = [];
+
+    function unique(arr) {
+        var res = [];
+        var json = {};
+        for (var i = 0; i < arr.length; i++) {
+            if (!json[arr[i]]) {
+                res.push(arr[i]);
+                json[arr[i]] = 1;
+            }
+        }
+        return res;
+    }
+
+    var $checkableTree = $('#treeview-checkable').treeview({
+        data: defaultData,
+        showIcon: false,
+        showCheckbox: true,
+        collapseIcon: "glyphicon glyphicon-chevron-down",
+        expandIcon: "glyphicon glyphicon-chevron-right",
+        checkedIcon: "glyphicon glyphicon-check",
+        onNodeChecked: function(event, node) { //选中节点
+            var selectNodes = getChildNodeIdArr(node); //获取所有子节点
+            if (selectNodes) { //子节点不为空，则选中所有子节点
+                $('#treeview-checkable').treeview('checkNode', [selectNodes, { silent: true }]);
+            }
+            if(node.selectable==true){
+                if(node.nodes){
+                    if(textList.length==0){
+                        textList = node.nodes;
+                    }else{
+                        for(var i=0; i<node.nodes.length; i++){
+                            textList = $.grep(textList,function(n,j){
+                                return n.id != node.nodes[i].id;
+                            });
+                            textList.push(node.nodes[i]);
+                        }
+                    }
+                }else{
+                    if(node.parentId > -1){
+                        if(textList.length==0){
+                            textList.push(node);
+                        }else{
+                            textList = $.grep(textList,function(n,i){
+                                return n.id != node.id;
+                            });
+                            textList.push(node);
+                        }
+                    }else{
+                        return $('#treeview-checkable').treeview('uncheckNode',[[node.nodeId], {silent: true}]);
+                    }
+                }
+            }
+            addChecked(textList);
+            setParentNodeCheck2(node);
+        },
+        onNodeUnchecked: function(event, node) { //取消选中节点
+            if(node.nodes){
+                var childNodes = getChildNodeIdArr(node);
+                $('#treeview-checkable').treeview('uncheckNode', [childNodes, {silent: false}]);
+                for(var i=0; i<node.nodes.length; i++){
+                    textList = $.grep(textList,function(n,j){
+                        return n.id != node.nodes[i].id;
+                    });
+                }
+            }else{
+                $('#treeview-checkable').treeview('uncheckNode',[[node.parentId], {silent: true}]);
+                textList = $.grep(textList,function(n,i){
+                    return n.id != node.id;
+                });
+            }
+            addChecked(textList);
+        }
+    });
+    // 清除左侧所有内容
+    $('.empty').on('click', function () {
+        $('#checkable-output').empty();
+    })
+
+//将所有选定节点添加到选定框
+    function addChecked(ched){
+        var h = '';
+        $.each(ched, function(i){
+            h = h+'<div class="bianji"><div>' + ched[i].text + 
+                '</div><i onclick="delthisnode($(this),'+ched[i].nodeId+','+ 
+                ched[i].parentId +')" class="fa fa-close"></i>  <i class="glyphicon glyphicon-remove"></i></div>';
+        });
+        $('#checkable-output').html(h);
+       
+    }
+    // 选中父节点时，选中所有子节点
+    function getChildNodeIdArr(node) {
+        var ts = [];
+        if (node.nodes) {
+            for (x in node.nodes) {
+                ts.push(node.nodes[x].nodeId);
+                if (node.nodes[x].nodes) {
+                    var getNodeDieDai = getChildNodeIdArr(node.nodes[x]);
+                    for (j in getNodeDieDai) {
+                        ts.push(getNodeDieDai[j]);
+                    }
+                }
+            }
+        } else {
+            ts.push(node.nodeId);
+        }
+        return ts;
+    }
+
+    // 选中所有子节点时，选中父节点 取消子节点时取消父节点
+    function setParentNodeCheck2(node) {
+        var parentNode = $("#treeview-checkable").treeview("getNode", node.parentId);
+        if (parentNode.nodes) {
+            var checkedCount = 0;
+            for (x in parentNode.nodes) {
+                if (parentNode.nodes[x].state.checked) {
+                    checkedCount++;
+                } else {
+                    break;
+                }
+            }
+            if (checkedCount == parentNode.nodes.length) { //如果子节点全部被选 父全选
+                $("#treeview-checkable").treeview("checkNode", parentNode.nodeId);
+                setParentNodeCheck2(parentNode);
+            } else { //如果子节点未全部被选 父未全选
+                $('#treeview-checkable').treeview('uncheckNode', parentNode.nodeId);
+                setParentNodeCheck2(parentNode);
+            }
+        }
+    }
+
+    // 取消父节点时 取消所有子节点
+    function setChildNodeUncheck(node) {
+        if (node.nodes) {
+            var ts = []; //当前节点子集中未被选中的集合
+            for (x in node.nodes) {
+                if (!node.nodes[x].state.checked) {
+                    ts.push(node.nodes[x].nodeId);
+                }
+                if (node.nodes[x].nodes) {
+                    var getNodeDieDai = node.nodes[x];
+                    console.log(getNodeDieDai);
+                    for (j in getNodeDieDai) {
+                        if (!getNodeDieDai.nodes[x].state.checked) {
+                            ts.push(getNodeDieDai[j]);
+                        }
+                    }
+                }
+            }
+        }
+        return ts;
+    }
+    $('#confirm_select').click(function(){
+        // console.log(textList)
+        var hid = '';
+        var ids = [];
+        var text = [];
+        $.each(textList,function(i,n){
+            text.push(n.text);
+            ids.push(n.id);
+        });
+        $.each(ids,function(k,v){
+            hid = hid+'<input type="hidden" name="recipient_relation[]" class="hiddenSend" value="'+v+'">';
+        });
+        $('[name="participator2"]').after(hid);
+        $('[name="participator2"]').val(text.join(','));
+    });
+
+    // 模糊搜索
+    $('#input-check-node2').on('keyup', function (e) {
+        $checkableTree.treeview('search', [$('#input-check-node').val(), {ignoreCase: false, exactMatch: false}])
+    });
+
+    //将所有选定节点添加到选定框
+    function addChecked(ched){
+        var h = '';
+        $.each(ched, function(i){
+            h = h+'<div class="bianji righ-node'+ched[i].nodeId+'"><div>' + ched[i].text +
+                '</div><i onclick="delthisnode($(this),'+ched[i].nodeId+','+
+                ched[i].parentId +')" class="glyphicon glyphicon-remove"></i></div>';
+        });
+        $('#checkable-output').html(h);
+    }
+    //节点自己删除自己
+    function delthisnode(t,nodeId,parentId=''){
+    	console.log(t,nodeId,parentId)
+        $('#treeview-checkable').treeview('uncheckNode',[[nodeId], {silent: true}]);
+        if(parentId != ''){
+            $('#treeview-checkable').treeview('uncheckNode',[[parentId], {silent: true}]);
+        }
+        textList = $.grep(textList,function(n){
+            return n.nodeId != nodeId;
+        });
+
+        t.parent().remove();
+        $('#checkable-output .righ-node'+nodeId).remove();
+    }
+
+    //确认选定的节点
+    $('#mymodal-sub').click(function(){
+        var ht = '';
+        var names = [];
+        var ids = [];
+        $.each(textList,function(i,n){
+            names.push(n.name);
+            ids.push(n.id);
+        });
+        $.each(ids,function(i,n){
+            ht = ht+'<input type="hidden" name="copy[]" value="'+n+'">';
+        });
+        $('input[name="participator2"]').val(names.join(','));
+        $('input[name="participator2"]').after(ht);
+    });
+    //编辑右侧抄送单个删除
+    function delCopy(relation_id,t){
+        var delurl = "{:url('work/delrelation',[],false)}/relation_id/"+relation_id+'.html';
+        $.get(delurl,function(data){
+            if(data.code==200){
+                t.parent().remove();
+            }
+        },'json');
+    }
+</script>
+</body>
+
+</html>
